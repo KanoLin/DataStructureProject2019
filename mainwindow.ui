@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1067</width>
+    <height>725</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>1047</width>
+         <height>588</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTableWidget" name="table"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>64</width>
+     <height>64</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNewFile"/>
+   <addaction name="actionOpenFile"/>
+   <addaction name="actionSearch"/>
+   <addaction name="actionInsert"/>
+   <addaction name="actionDelete"/>
+   <addaction name="actionUpdate"/>
+   <addaction name="actionInsertTXT"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNewFile">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/new_file</normaloff>:/img/new_file</iconset>
+   </property>
+   <property name="text">
+    <string>新建</string>
+   </property>
+   <property name="toolTip">
+    <string>新建一个数据库</string>
+   </property>
+   <property name="statusTip">
+    <string>新建</string>
+   </property>
+   <property name="whatsThis">
+    <string>新建</string>
+   </property>
+  </action>
+  <action name="actionOpenFile">
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/open_file</normaloff>:/img/open_file</iconset>
+   </property>
+   <property name="text">
+    <string>打开</string>
+   </property>
+   <property name="toolTip">
+    <string>从以保存的文件打开数据库</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/find</normaloff>:/img/find</iconset>
+   </property>
+   <property name="text">
+    <string>查询</string>
+   </property>
+   <property name="toolTip">
+    <string>查询特定记录</string>
+   </property>
+  </action>
+  <action name="actionInsert">
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/insert</normaloff>:/img/insert</iconset>
+   </property>
+   <property name="text">
+    <string>新增</string>
+   </property>
+   <property name="toolTip">
+    <string>新增一条记录</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/delete</normaloff>:/img/delete</iconset>
+   </property>
+   <property name="text">
+    <string>删除</string>
+   </property>
+   <property name="toolTip">
+    <string>删除特定记录</string>
+   </property>
+  </action>
+  <action name="actionUpdate">
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/update</normaloff>:/img/update</iconset>
+   </property>
+   <property name="text">
+    <string>修改</string>
+   </property>
+   <property name="toolTip">
+    <string>更新数据</string>
+   </property>
+  </action>
+  <action name="actionInsertTXT">
+   <property name="icon">
+    <iconset resource="tool_img.qrc">
+     <normaloff>:/img/insert_txt</normaloff>:/img/insert_txt</iconset>
+   </property>
+   <property name="text">
+    <string>批量新增</string>
+   </property>
+   <property name="toolTip">
+    <string>从TXT文件批量新增</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="tool_img.qrc"/>
+ </resources>
+ <connections/>
+</ui>
