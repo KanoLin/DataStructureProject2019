@@ -5,24 +5,14 @@
 #include<cstring>
 #include<string>
 #include<string.h>
-
-
 using namespace std;
-
-void Strncat(char *s1, char* s2,int len) {
-    int lens1 = strlen(s1), lens2 = strlen(s2);
-    for (int i = lens1, j = 0; j < lens2; i++, j++) {
-        s1[i] = s2[j];
-    }
-}
 
 void BPlusTree::Print(char tableName[30]) {
 	char filePathName[50];
 	int tableNameLen = strlen(tableName);
-    //strcpy(filePathName, "");
-    memset(filePathName,'\0',sizeof(filePathName));
-    Strncat(filePathName, tableName, tableNameLen);
-    Strncat(filePathName, "_bplustree.txt", 14);
+	memset(filePathName, '\0', sizeof(filePathName));
+	Strncat(filePathName, tableName, tableNameLen);
+	Strncat(filePathName, "_bplustree.txt", 14);
 
 	ofstream out;
 	out.open(filePathName, ios::out);
@@ -32,7 +22,7 @@ void BPlusTree::Print(char tableName[30]) {
 	while (!Q.empty()) {
 		Node* tmpQ = Q.front(); int tmpL = L.front();
 		Q.pop(); L.pop();
-		for (int i = 1; i <= tmpQ->num-1; i++)
+		for (int i = 1; i <= tmpQ->num - 1; i++)
 			out << tmpQ->key[i] << "--";
 		out << tmpQ->key[tmpQ->num] << "    ";
 		if (tmpQ->is_leaf == true) continue;
@@ -52,10 +42,9 @@ void BPlusTree::Save(char tableName[30]) {
 	char filePathName[50];
 	char tmp[30] = "_bplustree_data.txt";
 	int tableNameLen = strlen(tableName);
-    //strcpy(filePathName, "");
-    memset(filePathName,'\0',sizeof(filePathName));
-    Strncat(filePathName, tableName, tableNameLen);
-    Strncat(filePathName, tmp, 19);
+	memset(filePathName, '\0', sizeof(filePathName));
+	Strncat(filePathName, tableName, tableNameLen);
+	Strncat(filePathName, tmp, 19);
 	ofstream out;
 	out.open(filePathName, ios::out);
 	Node* pos = root;
@@ -87,7 +76,7 @@ Node* BPlusTree::Node_new() {
 	for (int i = 0; i < M + 5; i++) node->bytes[i] = 0;
 	for (int i = 0; i < M + 5; i++) node->ch[i] = NULL;
 	node->fath = NULL;
-	node->prev = NULL; node->next = NULL; 
+	node->prev = NULL; node->next = NULL;
 	node->num = 0;
 	return node;
 }
@@ -107,7 +96,7 @@ Node* BPlusTree::Search_leaf(Node* now, int target) {
 			break;
 		}
 	}
-	if (flag == false) 
+	if (flag == false)
 		return Search_leaf(now->ch[now->num + 1], target);
 }
 
@@ -120,26 +109,38 @@ long BPlusTree::Search_bytes(int target) {
 			break;
 		}
 	}
-	if (k == 0) return -1;//ËÆ∞ÂΩï‰∏çÂ≠òÂú®
+	if (k == 0) return -1;//º«¬º≤ª¥Ê‘⁄
 	return pos->bytes[k];
+}
+
+void BPlusTree::Search_rangebytes(int l, int r, int& result_num, long*& result_adr) {
+	Node* pos = Search_leaf(root, l);
+	while (pos != NULL) {
+		for (int i = 1; i <= pos->num; i++) {
+			if (l <= pos->key[i] && pos->key[i] <= r && result_num < 2000) {
+				result_adr[result_num++] = pos->bytes[i];
+			}
+		}
+		pos = pos->next;
+	}
 }
 
 void BPlusTree::Split(Node* p1) {
 	Node* fa = p1->fath;
-	
+
 	Node* p2 = Node_new();
 	p2->is_leaf = p1->is_leaf;
 	p2->fath = p1->fath;
-	
+
 	if (M % 2 == 0) {
 		p1->num = M / 2;
-		p2->num = M / 2 - 1; 
+		p2->num = M / 2 - 1;
 	}
 	else {
 		p1->num = M / 2;
 		p2->num = M / 2;
 	}
-	
+
 	for (int i = 1; i <= p2->num; i++) {
 		p2->key[i] = p1->key[p1->num + i + 1];
 		p2->bytes[i] = p1->bytes[p1->num + i + 1];
@@ -153,7 +154,7 @@ void BPlusTree::Split(Node* p1) {
 		p2->bytes[1] = p1->bytes[p1->num + 1];
 		p2->num++;
 	}
-	
+
 	if (p2->is_leaf == false) {
 		for (int i = 1; i <= p2->num + 1; i++) {
 			p2->ch[i] = p1->ch[p1->num + i + 1];
@@ -198,11 +199,12 @@ bool BPlusTree::Insert(Node*& root, int target, long byt) {
 	for (int i = 1; i <= pos->num; i++) {
 		if (target == pos->key[i]) {
 			k = i;
-			break;		}
+			break;
+		}
 	}
-	if (k != 0) return false;//ËÆ∞ÂΩïÂ∑≤Â≠òÂú®Ôºå‰∏çÂÖÅËÆ∏ÈáçÂ§çÊèíÂÖ•
-	
-	//ÊèíÂÖ•
+	if (k != 0) return false;//º«¬º“—¥Ê‘⁄£¨≤ª‘ –Ì÷ÿ∏¥≤Â»Î
+
+	//≤Â»Î
 	bool flag = false;
 	for (int i = 1; i <= pos->num; i++) {
 		if (target <= pos->key[i]) {
@@ -221,10 +223,10 @@ bool BPlusTree::Insert(Node*& root, int target, long byt) {
 		pos->bytes[pos->num + 1] = byt;
 	}
 	pos->num++;
-	
-	//ÂàÜË£Ç
+
+	//∑÷¡—
 	if (pos->num == M) {
-		if (pos == root) {//Ê†πÁªìÁÇπ
+		if (pos == root) {//∏˘Ω·µ„
 			Node* node = Node_new();
 			node->is_leaf = false;
 			node->ch[1] = pos;
@@ -232,7 +234,7 @@ bool BPlusTree::Insert(Node*& root, int target, long byt) {
 			root = node;
 			Split(pos);
 		}
-		else {//Âè∂Â≠êÁªìÁÇπ
+		else {//“∂◊”Ω·µ„
 			while (pos->num == M && pos != root) {
 				Split(pos);
 				pos = pos->fath;
@@ -255,7 +257,7 @@ bool BPlusTree::Insert(Node*& root, int target, long byt) {
 bool BPlusTree::Left_transfer(Node* p) {
 	if (p->prev != NULL && p->fath == p->prev->fath && p->prev->num > ceil(double(M) / 2) - 1) {
 		Node* leftsli = p->prev;
-		if (p->is_leaf == true) {//Âè∂ÁªìÁÇπ
+		if (p->is_leaf == true) {//“∂Ω·µ„
 			for (int i = p->num + 1; i >= 2; i--) {
 				p->key[i] = p->key[i - 1];
 				p->bytes[i] = p->bytes[i - 1];
@@ -272,13 +274,13 @@ bool BPlusTree::Left_transfer(Node* p) {
 				}
 			}
 		}
-		else {//‰∏≠Èó¥ËäÇÁÇπ
+		else {//÷–º‰Ω⁄µ„
 			for (int i = p->num + 1; i >= 2; i--) {
 				p->key[i] = p->key[i - 1];
 				p->bytes[i] = p->bytes[i - 1];
 			}
 			for (int i = p->num + 2; i >= 2; i--) p->ch[i] = p->ch[i - 1];
-				
+
 			for (int i = 1; i <= p->fath->num; i++) {
 				if (p->fath->ch[i] == leftsli && p->fath->ch[i + 1] == p) {
 					p->key[1] = p->fath->key[i];
@@ -301,7 +303,7 @@ bool BPlusTree::Left_transfer(Node* p) {
 bool BPlusTree::Right_transfer(Node* p) {
 	if (p->next != NULL && p->fath == p->next->fath && p->next->num > ceil(double(M) / 2) - 1) {
 		Node* rightsli = p->next;
-		if (p->is_leaf == true) {//Âè∂ÁªìÁÇπ
+		if (p->is_leaf == true) {//“∂Ω·µ„
 			p->key[p->num + 1] = rightsli->key[1];
 			p->bytes[p->num + 1] = rightsli->bytes[1];
 			p->num++;
@@ -318,7 +320,7 @@ bool BPlusTree::Right_transfer(Node* p) {
 				}
 			}
 		}
-		else {//‰∏≠Èó¥ÁªìÁÇπ
+		else {//÷–º‰Ω·µ„
 			for (int i = 1; i <= p->fath->num; i++) {
 				if (p->fath->ch[i] == p && p->fath->ch[i + 1] == rightsli) {
 					p->key[p->num + 1] = p->fath->key[i];
@@ -341,13 +343,13 @@ bool BPlusTree::Right_transfer(Node* p) {
 
 		return true;
 	}
-	
+
 	return false;
 }
 
 bool BPlusTree::Merge(Node* p1, Node* p2) {
 	if (p1 != NULL && p2 != NULL && p1->fath == p2->fath) {
-		if (p1->is_leaf == true) {//Âè∂ÁªìÁÇπ
+		if (p1->is_leaf == true) {//“∂Ω·µ„
 			for (int i = p1->num + 1, j = 1; j <= p2->num; i++, j++) {
 				p1->key[i] = p2->key[j];
 				p1->bytes[i] = p2->bytes[j];
@@ -369,13 +371,13 @@ bool BPlusTree::Merge(Node* p1, Node* p2) {
 				}
 			}
 		}
-		else {//‰∏≠Èó¥ÁªìÁÇπ
+		else {//÷–º‰Ω·µ„
 			for (int i = 1; i <= p1->fath->num; i++) {
 				if (p1->fath->ch[i] == p1 && p1->fath->ch[i + 1] == p2) {
 					p1->key[p1->num + 1] = p1->fath->key[i];
 					p1->bytes[p1->num + 1] = p1->fath->bytes[i];
 					p1->num += 1;
-					for (int j = p1->num + 1 , k = 1; k <= p2->num; j++, k++) {
+					for (int j = p1->num + 1, k = 1; k <= p2->num; j++, k++) {
 						p1->key[j] = p2->key[k];
 						p1->bytes[j] = p2->bytes[k];
 					}
@@ -407,25 +409,25 @@ bool BPlusTree::Merge(Node* p1, Node* p2) {
 
 bool BPlusTree::Delete(Node*& root, int target) {
 	Node* pos = Search_leaf(root, target);
-	
+
 	int k = 0;
 	for (int i = 1; i <= pos->num; i++) {
-		if (target == pos->key[i]) {			
+		if (target == pos->key[i]) {
 			k = i;
 			break;
 		}
 	}
-	if (k == 0) return false;//ËÆ∞ÂΩï‰∏çÂ≠òÂú®
-	
-	//Âà†Èô§
+	if (k == 0) return false;//º«¬º≤ª¥Ê‘⁄
+
+	//…æ≥˝
 	for (int i = k; i <= pos->num - 1; i++) {
 		pos->key[i] = pos->key[i + 1];
 		pos->bytes[i] = pos->bytes[i + 1];
 	}
 	pos->num--;
 
-	if (pos != root) {//‰∏çÊòØÊ†πÁªìÁÇπÔºåÈúÄË¶ÅËÄÉËôëË∞ÉÊï¥Ê†ëÁªìÊûÑ
-		//ËÄÉËôëÂà†Èô§‰πãÂêéÂØπÁà∂ÁªìÁÇπÁöÑÂΩ±Âìç
+	if (pos != root) {//≤ª «∏˘Ω·µ„£¨–Ë“™øº¬«µ˜’˚ ˜Ω·ππ
+		//øº¬«…æ≥˝÷Æ∫Û∂‘∏∏Ω·µ„µƒ”∞œÏ
 		if (k == 1 && pos != pos->fath->ch[1]) {
 			for (int i = 2; i <= pos->fath->num + 1; i++) {
 				if (pos == pos->fath->ch[i]) {
@@ -436,20 +438,20 @@ bool BPlusTree::Delete(Node*& root, int target) {
 			}
 		}
 
-		//Âà†Èô§ÂêéÁªìÁÇπ‰∏™Êï∞Êª°Ë∂≥Êù°‰ª∂ÔºåÊìç‰ΩúÁªìÊùü
+		//…æ≥˝∫ÛΩ·µ„∏ˆ ˝¬˙◊„Ãıº˛£¨≤Ÿ◊˜Ω· ¯
 		if (pos->num >= ceil(double(M) / 2) - 1) return true;
 
-		//ÂêëÂÖÑÂºüÁªìÁÇπÂÄükey
+		//œÚ–÷µ‹Ω·µ„ΩËkey
 		bool flag = false;
 		if (Left_transfer(pos) == true) flag = true;
 		else if (Right_transfer(pos) == true) flag = true;
 		if (flag == true) return true;
 
-		//ÂÖÑÂºüÁªìÁÇπ‰∏≠Ê≤°ÊúâÂØå‰ΩôÁöÑkey,ÂàôÂΩìÂâçÁªìÁÇπÂíåÂÖÑÂºüÁªìÁÇπÂêàÂπ∂Êàê‰∏Ä‰∏™Êñ∞ÁöÑÂè∂Â≠êÁªìÁÇπ
+		//–÷µ‹Ω·µ„÷–√ª”–∏ª”‡µƒkey,‘Úµ±«∞Ω·µ„∫Õ–÷µ‹Ω·µ„∫œ≤¢≥…“ª∏ˆ–¬µƒ“∂◊”Ω·µ„
 		if (Merge(pos->prev, pos) == true) {}
 		else if (Merge(pos, pos->next) == true) {}
 		pos = pos->fath;
-		//keyÁöÑÊï∞ÈáèËøáÂ∞ë
+		//keyµƒ ˝¡øπ˝…Ÿ
 		while (pos->num < ceil(double(M) / 2) - 1) {
 			if (pos == root) {
 				if (pos->num == 0) {
@@ -475,11 +477,10 @@ bool BPlusTree::Delete(Node*& root, int target) {
 bool is_exist(BPlusTree& tmpbpt, char tableName[30]) {
 	char filePathName[50];
 	int tableNameLen = strlen(tableName);
-    //strcpy(filePathName, "");
-    memset(filePathName,'\0',sizeof(filePathName));
-    Strncat(filePathName, tableName, tableNameLen);
-    Strncat(filePathName, "_bplustree_data.txt", 19);
-	
+	memset(filePathName, '\0', sizeof(filePathName));
+	Strncat(filePathName, tableName, tableNameLen);
+	Strncat(filePathName, "_bplustree_data.txt", 19);
+
 	ifstream in;
 	in.open(filePathName, ios::in);
 
@@ -497,5 +498,18 @@ bool is_exist(BPlusTree& tmpbpt, char tableName[30]) {
 		}
 		in.close();
 		return true;
+	}
+}
+
+void Strncat(char* s1, char* s2, int len) {
+	int lens1 = strlen(s1), lens2 = strlen(s2);
+	for (int i = lens1, j = 0; j < lens2; i++, j++) {
+		s1[i] = s2[j];
+	}
+}
+void Strncat(char* s1, const char* s2, int len) {
+	int lens1 = strlen(s1), lens2 = strlen(s2);
+	for (int i = lens1, j = 0; j < lens2; i++, j++) {
+		s1[i] = s2[j];
 	}
 }
