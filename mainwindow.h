@@ -41,6 +41,7 @@ public:
 //    char result[10000][20][30];
     int result_row;
     int select_column;
+    int select_where;
     int update_column;
     char input_line[30];
     char input_line2[30];

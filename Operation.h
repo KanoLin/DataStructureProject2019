@@ -119,7 +119,7 @@ public:
 		返回值：返回记录数量
 	*/
 
-	bool search(int row, char target[30],int rel);
+    bool search(int row, char target[30],int rel = 1);
 	/*
 		用途：查找第row个属性满足target条件的记录
 		参数解释：rel同search_adr的一样

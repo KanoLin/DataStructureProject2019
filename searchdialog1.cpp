@@ -19,6 +19,12 @@ SearchDialog1::SearchDialog1(QWidget *parent) :
     QPushButton *btncancel=ui->buttonBox->button(QDialogButtonBox::Cancel);
     btncancel->setText("取消");
     ui->comboBox->addItem("*",-1);
+    ui->comboBox_2->addItem("=",0);
+    ui->comboBox_2->addItem("<",1);
+    ui->comboBox_2->addItem("<=",2);
+    ui->comboBox_2->addItem(">",3);
+    ui->comboBox_2->addItem(">=",4);
+    ui->comboBox_2->addItem("like",5);
 }
 
 void SearchDialog1::setMainWindow(MainWindow *w)
@@ -38,6 +44,7 @@ void SearchDialog1::accept()
         return;
     }
     this->mw->select_column=ui->comboBox->currentData().toInt();
+    this->mw->select_where=ui->comboBox_2->currentData().toInt();
     QByteArray ba;
     ba=ui->lineEdit->text().toLatin1();
     std::strcpy(this->mw->input_line,ba.data());

@@ -59,7 +59,7 @@ void MainWindow::showNewFile()
     std::strcpy(c,this->table_name.c_str());
     operation->buildNewTable(c,this->column_num,this->column_name,this->type_list,this->primary_key+1);
 //    operation->saveBPlusTree();
-    qDebug()<<operation->binFileName<<endl;
+    qDebug()<<"记录长度："<<operation->recordSize<<endl;
     statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name));
 }
 
@@ -79,6 +79,9 @@ void MainWindow::showOpenFile()
         char c[30];
         std::strcpy(c,this->table_name.c_str());
         operation->chooseOldTable(c);
+
+        qDebug()<<"打开 记录："<<operation->recordSize;
+
         this->column_list.clear();
         this->column_num=operation->rowNum;
         for (int i=0;i<this->column_num;i++){
@@ -199,13 +202,11 @@ void MainWindow::showSearch()
     //s2.exec();
     //s.exec();
     if (s2.exec()){
-        if (this->select_column==-1){
-
-
-        }else if(!operation->search(select_column+1,input_line)){
+        if(!operation->search(select_column+1,input_line,this->select_where+1)){
             QMessageBox::warning(this,"警告","记录不存在！");
             return;
         }
+
         this->result_row=operation->shownum;
         statusBar()->showMessage("共有"+QString::number(this->result_row)+"条记录");
         qDebug()<<this->result_row;
