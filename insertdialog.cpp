@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QByteArray>
 #include <cstring>
+#include <QRegExp>
 
 InsertDialog::InsertDialog(QWidget *parent) :
     QDialog(parent),
@@ -40,9 +41,13 @@ void InsertDialog::setMainWindow(MainWindow *w)
 
 void InsertDialog::accept()
 {
+    QRegExp rx("-?[0-9]+");
     for (int i=0;i<mw->column_num;i++){
         if (this->input[i].text().isEmpty()){
             QMessageBox::warning(this,"警告","请输入完整！");
+            return;
+        }else if (this->mw->type_list[i]==0 && !rx.exactMatch(this->input[i].text().trimmed())){
+            QMessageBox::warning(this,"警告",QString(QLatin1String(mw->column_name[i]))+"属性为Int！");
             return;
         }
     }

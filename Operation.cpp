@@ -143,7 +143,7 @@ bool Operation::insertByHands(char cinData[20][30]) {
 	f.open(binFileName, ios::app | ios::binary);
 	if (!f) return false;
 	int tempInt[20];
-	char tempStr[20][30];
+    char tempStr[20][30]; memset(tempStr,'\0',sizeof(tempStr));
 	int tempIntIndex = 0, tempStrIndex = 0, temPrimKey = 0;
 	for (int i = 0; i < rowNum; i++) {
 		if (!bool_type[i]) {
@@ -205,17 +205,7 @@ void Operation::showRecord(long* adrs, int adr_num) {
 				if (!bool_type[i]) {
 					int tempInt, cnt1 = 0, cnt2 = 0;
 					f.read((char*)& tempInt, sizeof(int));
-					while (tempInt) {
-						show[k][i][cnt1++] = tempInt % 10 + '0';
-						tempInt /= 10;
-					}
-					cnt2 = cnt1 - 1; cnt1 = 0;
-					while (cnt1 < cnt2) {
-						char c = show[k][i][cnt1];
-						show[k][i][cnt1] = show[k][i][cnt2];
-						show[k][i][cnt2] = c;
-						cnt1++; cnt2--;
-					}
+                    int_to_char(tempInt,show[k][i]);
 					cout << show[k][i] << " ";
 				}
 				else {
@@ -468,4 +458,51 @@ bool partial_search(char* source, int destLen, char* target, int targetLen) {
 	}
 	for (int j = 0; j < targetLen; j++) wei[int(target[j])] = -1;
 	return false;
+}
+
+void Operation::int_to_char(int a,char b[])
+{
+    int len = 1;
+    int tem = 1;
+    int y = 0;
+    int f = 1;
+    if (a < 0)
+    {
+        a = -a;
+        f = -1;
+    }
+    for (int i = a; i / 10 > 0; i /= 10)
+    {
+        ++len;
+    }
+    for (int i = 1; i < len; i++)
+    {
+        tem = tem * 10;
+    }
+    if (a == 0)
+    {
+        b[0] = '0';
+    }
+    else if (f > 0)
+    {
+        for (int i = 0; i < len; i++)
+        {
+            y = a / tem;
+            a = a % tem;
+            tem = tem / 10;
+            b[i] = y + '0';
+        }
+    }
+    else
+    {
+        b[0] = '-';
+        for (int i = 1; i <= len; i++)
+        {
+            y = a / tem;
+            a = a % tem;
+            tem = tem / 10;
+            b[i] = y + '0';
+        }
+    }
+
 }

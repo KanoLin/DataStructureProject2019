@@ -84,9 +84,12 @@ void MainWindow::showOpenFile()
 
         this->column_list.clear();
         this->column_num=operation->rowNum;
+
+
         for (int i=0;i<this->column_num;i++){
             std::strcpy(this->column_name[i],operation->rowName[i]);
             this->column_list<<QString(this->column_name[i]);
+            this->type_list[i]=operation->bool_type[i];
         }
 
         this->primary_key=operation->primaryKeyNum-1;
@@ -155,10 +158,7 @@ void MainWindow::showDelete()
     DeleteDialog d(this);
     d.setMainWindow(this);
     if (d.exec()){
-        //ui->table->clearContents();
-        if (this->select_column==-1){
-
-        }else if (!operation->deletee(this->select_column+1,this->input_line)){
+        if (!operation->deletee(this->select_column+1,this->input_line,this->select_where+1)){
             QMessageBox::warning(this,"警告","删除失败！");
             return;
         }
@@ -179,7 +179,7 @@ void MainWindow::showUpdate()
     u.setMainWindow(this);
     if (u.exec()){
 //        ui->table->clearContents();
-        if (!operation->revise(this->select_column+1,this->input_line,this->input_line2,this->update_column+1)){
+        if (!operation->revise(this->select_column+1,this->input_line,this->input_line2,this->update_column+1,this->select_where+1)){
             QMessageBox::warning(this,"警告","修改失败！");
             return;
         }
@@ -222,8 +222,11 @@ void MainWindow::setTableHead()
     ui->table->setColumnCount(this->column_list.count());
     qDebug()<<"column"<<ui->table->columnCount();
     QTableWidgetItem *head_item;
+    QString type_str=" (int)";
     for (int i=0;i<this->column_list.count();i++){
-        head_item=new QTableWidgetItem(column_list.at(i));
+        if (this->type_list[i])type_str=" (str)";
+        else type_str=" (int)";
+        head_item=new QTableWidgetItem(column_list.at(i)+type_str);
         if (this->primary_key==i)head_item->setTextColor(Qt::red);
         ui->table->setHorizontalHeaderItem(i,head_item);
     }
@@ -238,7 +241,7 @@ void MainWindow::showTable()
     for (int i=0;i<result_row;i++){
         for (int j=0;j<column_list.count();j++){
             item=new QTableWidgetItem(QString(operation->show[i][j]));
-            item->setTextAlignment(Qt::AlignRight);
+            item->setTextAlignment(Qt::AlignRight|Qt::AlignHCenter);
 //            qDebug()<<QString(operation->show[i][j])<<endl;
             ui->table->setItem(i,j,item);
         }

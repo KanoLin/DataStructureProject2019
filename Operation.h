@@ -162,6 +162,8 @@ public:
 	*/
 
 	void saveBPlusTree();
+
+    void int_to_char(int a,char b[]);
 };
 
 int char_to_int(char source[30]);
