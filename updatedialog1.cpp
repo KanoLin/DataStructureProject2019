@@ -67,7 +67,7 @@ void UpdateDialog1::accept()
     std::strcpy(this->mw->input_line,ba.data());
     ba=ui->lineEdit_2->text().toLatin1();
     std::strcpy(this->mw->input_line2,ba.data());
-    qDebug()<<"update accept"<<endl;
+//    qDebug()<<"update accept"<<endl;
     QDialog::accept();
 }
 

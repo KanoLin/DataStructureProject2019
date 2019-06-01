@@ -58,7 +58,7 @@ void DeleteDialog::accept()
     QByteArray ba;
     ba=ui->lineEdit->text().toLatin1();
     std::strcpy(this->mw->input_line,ba.data());
-    qDebug()<<"delete accept"<<this->mw->select_column<<endl;
+//    qDebug()<<"delete accept"<<this->mw->select_column<<endl;
 
     QDialog::accept();
 }

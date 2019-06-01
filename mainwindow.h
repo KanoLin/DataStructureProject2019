@@ -8,6 +8,7 @@
 #include <QStringList>
 
 #include "Operation.h"
+#include <sys/time.h>
 
 namespace Ui {
 class MainWindow;
@@ -30,6 +31,8 @@ public:
     void setTableHead();
     void showTable();
 
+    double getTime();
+
     QString filePath;//数据表文件
     bool isOpenTable=false;//是否已打开文件
     std::string table_name;
@@ -45,6 +48,9 @@ public:
     int update_column;
     char input_line[30];
     char input_line2[30];
+
+    struct timeval tpstart,tpend;
+    double timeuse;
 
     QStringList column_list;
 

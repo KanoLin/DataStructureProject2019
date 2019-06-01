@@ -193,10 +193,10 @@ void Operation::showRecord(long* adrs, int adr_num) {
 	fstream f;
 	f.open(binFileName, ios::in | ios::binary);
 
-	shownum = adr_num;
-	for (int k = 0; k < adr_num && k < 2000; k++) {
+    shownum = (adr_num>showSize)?showSize:adr_num;
+    for (int k = 0; k < adr_num && k < showSize; k++) {
 		memset(show[k], '\0', sizeof(show[k]));
-		cout << "第" << k + 1 << "条记录：";
+        //cout << "第" << k + 1 << "条记录：";
 		f.seekg(adrs[k], ios::beg);
 		bool flag = 0;
 		f.read((char*)& flag, sizeof(bool));
@@ -206,15 +206,15 @@ void Operation::showRecord(long* adrs, int adr_num) {
 					int tempInt, cnt1 = 0, cnt2 = 0;
 					f.read((char*)& tempInt, sizeof(int));
                     int_to_char(tempInt,show[k][i]);
-					cout << show[k][i] << " ";
+                    //cout << show[k][i] << " ";
 				}
 				else {
 					f.read((char*)& show[k][i], sizeof(char) * 30);
-					cout << show[k][i] << " ";
+                    //cout << show[k][i] << " ";
 				}
 			}
 		}
-		cout << endl;
+        //cout << endl;
 	}
 	f.close();
 }
@@ -244,9 +244,9 @@ int Operation::search_adr(int row, char target[30], long*& result_adr, int rel) 
 				now++;
 				if (start <= now) {
 					result_adr[result_num++] = (i * long(recordSize) + infoSize);
-					if (result_num == 1000) {
+                    if (result_num == maxResultNum) {
 						f.close();
-						return 1000;
+                        return result_num;
 					}
 				}
 			}
@@ -263,12 +263,11 @@ int Operation::search_adr(int row, char target[30], long*& result_adr, int rel) 
 				the_result = bpt.Search_bytes(intTarget);
 				if (the_result == -1) return 0;
 				else {
-					if (result_num < 2000) result_adr[result_num++] = the_result;
+                    if (result_num < maxResultNum) result_adr[result_num++] = the_result;
 					f.close();
 					return 1;
 				}
 			}
-
 			if (rel == 2) bpt.Search_rangebytes(-2147483647, intTarget - 1, result_num, result_adr);
 			else if (rel == 3) bpt.Search_rangebytes(-2147483647, intTarget, result_num, result_adr);
 			else if (rel == 4) bpt.Search_rangebytes(intTarget + 1, 2147483647, result_num, result_adr);
@@ -282,19 +281,19 @@ int Operation::search_adr(int row, char target[30], long*& result_adr, int rel) 
 			f.read((char*)& flag, sizeof(bool));
 			f.seekg(p, ios::beg);
 			f.read((char*)& tempInt, sizeof(int));
-			if (tempInt == intTarget && flag && rel == 1 && result_num < 2000) {
+            if (tempInt == intTarget && flag && rel == 1 && result_num < maxResultNum) {
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
-			else if (tempInt < intTarget && flag && rel == 2 && result_num < 2000) {
+            else if (tempInt < intTarget && flag && rel == 2 && result_num < maxResultNum) {
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
-			else if (tempInt <= intTarget && flag && rel == 3 && result_num < 2000) {
+            else if (tempInt <= intTarget && flag && rel == 3 && result_num < maxResultNum) {
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
-			else if (tempInt > intTarget && flag && rel == 4 && result_num < 2000) {
+            else if (tempInt > intTarget && flag && rel == 4 && result_num < maxResultNum) {
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
-			else if (tempInt >= intTarget && flag && rel == 5 && result_num < 2000) {
+            else if (tempInt >= intTarget && flag && rel == 5 && result_num < maxResultNum) {
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
 		}
@@ -311,10 +310,10 @@ int Operation::search_adr(int row, char target[30], long*& result_adr, int rel) 
 			f.read((char*)& flag, sizeof(bool));
 			f.seekg(p, ios::beg);
 			f.read((char*)& temChar, sizeof(temChar));
-			if (!strcmp(target, temChar) && flag && rel == 1 && result_num < 2000) {
+            if (!strcmp(target, temChar) && flag && rel == 1 && result_num < maxResultNum) {
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
-			else if (partial_search(temChar, strlen(temChar), target, strlen(target)) && flag && rel == 6 && result_num < 2000){
+            else if (partial_search(temChar, strlen(temChar), target, strlen(target)) && flag && rel == 6 && result_num < maxResultNum){
 				result_adr[result_num++] = (i * long(recordSize) + infoSize);
 			}
 		}
@@ -324,8 +323,9 @@ int Operation::search_adr(int row, char target[30], long*& result_adr, int rel) 
 }
 
 bool Operation::search(int row, char target[30], int rel) {
-	long* result_adr = new long[2000];
+    long* result_adr = new long[maxResultNum];
 	int result_num = search_adr(row, target, result_adr, rel);
+    result_nums=result_num;
 	if (result_num == 0) {
 		delete[]result_adr;
 		return false;
@@ -370,9 +370,9 @@ void Operation::deleteInBPlusTree(long* adrs, int adr_num) {
 	f.close();
 }
 bool Operation::deletee(int row, char target[30],int rel) {
-	long* result_adr = new long[2000];
+    long* result_adr = new long[maxResultNum];
 	int result_num = search_adr(row, target, result_adr, rel);
-
+    result_nums=result_num;
 	if (result_num == 0) {
 		delete[]result_adr;
 		return false;
@@ -401,9 +401,10 @@ void Operation::upDateRecord(long adr, char reviseData[30], bool type) {
 }
 
 bool Operation::revise(int searchRow, char target[30], char reviseData[30], int reviseRow, int rel) {
-	long* result_adr = new long[2000];
+    long* result_adr = new long[maxResultNum];
 	int result_num = search_adr(searchRow, target, result_adr, rel);
 	showRecord(result_adr, result_num);
+    result_nums=result_num;
 	if (result_num == 0) {
 		delete[]result_adr;
 		return false;
@@ -419,7 +420,7 @@ bool Operation::revise(int searchRow, char target[30], char reviseData[30], int 
 
 void Operation::saveBPlusTree() {
 	bpt.Save(tableName);
-	bpt.Print(tableName);
+    //bpt.Print(tableName);
 }
 
 int char_to_int(char source[30]) {

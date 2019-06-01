@@ -22,13 +22,13 @@
 #include <cstring>
 #include <QStatusBar>
 #include "Operation.h"
+#include <sys/time.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-//    ui->toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->setWindowFlags(windowFlags()&~Qt::WindowContextHelpButtonHint);//去掉帮助按钮
     connect(ui->actionNewFile,&QAction::triggered,this,&MainWindow::showNewFile);
     connect(ui->actionOpenFile,&QAction::triggered,this,&MainWindow::showOpenFile);
@@ -57,10 +57,15 @@ void MainWindow::showNewFile()
     setTableHead();
     char c[30];
     std::strcpy(c,this->table_name.c_str());
+    gettimeofday(&tpstart,NULL);
     operation->buildNewTable(c,this->column_num,this->column_name,this->type_list,this->primary_key+1);
 //    operation->saveBPlusTree();
-    qDebug()<<"记录长度："<<operation->recordSize<<endl;
-    statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name));
+
+    gettimeofday(&tpend,NULL);
+    QString timestr=" 操作用时："+QString::number(getTime())+"s";
+    qDebug()<<"记录字节长度："<<operation->recordSize<<endl;
+
+    statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name)+timestr);
 }
 
 void MainWindow::showOpenFile()
@@ -78,7 +83,13 @@ void MainWindow::showOpenFile()
         this->isOpenTable=true;
         char c[30];
         std::strcpy(c,this->table_name.c_str());
+
+        gettimeofday(&tpstart,NULL);
+
         operation->chooseOldTable(c);
+
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
 
         qDebug()<<"打开 记录："<<operation->recordSize;
 
@@ -95,7 +106,7 @@ void MainWindow::showOpenFile()
         this->primary_key=operation->primaryKeyNum-1;
 
         setTableHead();
-        statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name));
+        statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name)+timestr);
     }
 }
 
@@ -110,13 +121,18 @@ void MainWindow::showInsert()
     i.setMainWindow(this);
     memset(this->insert_content,'\0',sizeof(insert_content));
     if(i.exec()){
-//        ui->table->clearContents();
+        ui->table->clearContents();
+        ui->table->setRowCount(0);
+        gettimeofday(&tpstart,NULL);
         if (!operation->insertByHands(this->insert_content)){
             QMessageBox::warning(this,"警告","插入失败！");
         }
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
+
         operation->saveBPlusTree();
         qDebug()<<operation->binFileName<<endl;
-        statusBar()->showMessage("操作已完成,影响1行");
+        statusBar()->showMessage("操作已完成"+timestr);
     }
 }
 
@@ -132,20 +148,22 @@ void MainWindow::showInsertTXT()
     f.setDirectory(".");
     f.setNameFilter("*.txt");
     if (f.exec()){
-        //this->filePath=f.selectedFiles()[0];
-        //this->table_name=this->filePath.split("/").last().split(".").first().toStdString();
+        ui->table->clearContents();
+        ui->table->setRowCount(0);
         QString txt_name=f.selectedFiles()[0];
-//        qDebug()<<"已选择文件："<<filePath<<endl;
-//        qDebug()<<"文件名："<<QString::fromStdString(this->table_name)<<endl;
+
         char c[50];
         std::strcpy(c,txt_name.toStdString().c_str());
 
+        gettimeofday(&tpstart,NULL);
         if (!operation->insertByFile(c)){
             QMessageBox::warning(this,"警告","插入失败！");
         };
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
         operation->saveBPlusTree();
-        statusBar()->showMessage("批量插入已完成");
-        //setTableHead();
+        statusBar()->showMessage("批量插入已完成"+timestr);
+
     }
 }
 void MainWindow::showDelete()
@@ -158,11 +176,17 @@ void MainWindow::showDelete()
     DeleteDialog d(this);
     d.setMainWindow(this);
     if (d.exec()){
+        ui->table->clearContents();
+        ui->table->setRowCount(0);
+        gettimeofday(&tpstart,NULL);
         if (!operation->deletee(this->select_column+1,this->input_line,this->select_where+1)){
             QMessageBox::warning(this,"警告","删除失败！");
             return;
         }
-        statusBar()->showMessage("删除已完成");
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
+
+        statusBar()->showMessage("删除已完成 影响"+QString::number(operation->result_nums)+"行"+timestr);
         operation->saveBPlusTree();
     }
 
@@ -178,12 +202,16 @@ void MainWindow::showUpdate()
     UpdateDialog1 u(this);
     u.setMainWindow(this);
     if (u.exec()){
-//        ui->table->clearContents();
+        ui->table->clearContents();
+        ui->table->setRowCount(0);
+        gettimeofday(&tpstart,NULL);
         if (!operation->revise(this->select_column+1,this->input_line,this->input_line2,this->update_column+1,this->select_where+1)){
             QMessageBox::warning(this,"警告","修改失败！");
             return;
         }
-        statusBar()->showMessage("修改已完成");
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
+        statusBar()->showMessage("修改已完成 影响"+QString::number(operation->result_nums)+"行"+timestr);
         operation->saveBPlusTree();
     }
 }
@@ -202,13 +230,17 @@ void MainWindow::showSearch()
     //s2.exec();
     //s.exec();
     if (s2.exec()){
+        ui->table->clearContents();
+        ui->table->setRowCount(0);
+        gettimeofday(&tpstart,NULL);
         if(!operation->search(select_column+1,input_line,this->select_where+1)){
             QMessageBox::warning(this,"警告","记录不存在！");
             return;
         }
-
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
         this->result_row=operation->shownum;
-        statusBar()->showMessage("共有"+QString::number(this->result_row)+"条记录");
+        statusBar()->showMessage("显示"+QString::number(this->result_row)+"条记录 共有"+QString::number(operation->result_nums)+"行"+timestr);
         qDebug()<<this->result_row;
 
         showTable();
@@ -242,11 +274,16 @@ void MainWindow::showTable()
         for (int j=0;j<column_list.count();j++){
             item=new QTableWidgetItem(QString(operation->show[i][j]));
             item->setTextAlignment(Qt::AlignRight|Qt::AlignHCenter);
-//            qDebug()<<QString(operation->show[i][j])<<endl;
             ui->table->setItem(i,j,item);
         }
     }
     //ui->table->show();
 }
 
+double MainWindow::getTime()
+{
+    timeuse=(1000000*(tpend.tv_sec-tpstart.tv_sec) + tpend.tv_usec-tpstart.tv_usec)/1000000.0;
+    qDebug()<<"时间计算:"<<timeuse<<"s";
+    return timeuse;
+}
 

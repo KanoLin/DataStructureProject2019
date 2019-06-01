@@ -55,7 +55,7 @@ void SearchDialog1::accept()
     QByteArray ba;
     ba=ui->lineEdit->text().toLatin1();
     std::strcpy(this->mw->input_line,ba.data());
-    qDebug()<<"accept!!!"<<endl;
+//    qDebug()<<"accept!!!"<<endl;
     QDialog::accept();
 }
 

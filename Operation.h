@@ -7,6 +7,8 @@
 #include<iostream>
 #include<cmath>
 using namespace std;
+const int maxResultNum = 10000000;
+const int showSize = 10000;
 class Operation {
 public:
 	char tableName[30];
@@ -20,7 +22,8 @@ public:
 	int recordSize;
 
 	int shownum;
-	char show[2000][20][30];
+    int result_nums;
+    char show[showSize][20][30];
 
 	Operation() {
 		memset(tableName, 0, sizeof(tableName));
