@@ -53,19 +53,21 @@ void MainWindow::showNewFile()
 {
     NewFileWizard w(this);
     w.setMainWindow(this);
-    if(w.exec()&&this->table_name!="") this->isOpenTable=true;
-    setTableHead();
-    char c[30];
-    std::strcpy(c,this->table_name.c_str());
-    gettimeofday(&tpstart,NULL);
-    operation->buildNewTable(c,this->column_num,this->column_name,this->type_list,this->primary_key+1);
+    if(w.exec()&&this->table_name!="") {
+        this->isOpenTable=true;
+        setTableHead();
+        char c[30];
+        std::strcpy(c,this->table_name.c_str());
+        gettimeofday(&tpstart,NULL);
+        operation->buildNewTable(c,this->column_num,this->column_name,this->type_list,this->primary_key+1);
 //    operation->saveBPlusTree();
 
-    gettimeofday(&tpend,NULL);
-    QString timestr=" 操作用时："+QString::number(getTime())+"s";
-    qDebug()<<"记录字节长度："<<operation->recordSize<<endl;
+        gettimeofday(&tpend,NULL);
+        QString timestr=" 操作用时："+QString::number(getTime())+"s";
+        qDebug()<<"记录字节长度："<<operation->recordSize<<endl;
 
-    statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name)+timestr);
+        statusBar()->showMessage(QString("当前数据表：")+QString::fromStdString(this->table_name)+timestr);
+    }
 }
 
 void MainWindow::showOpenFile()

@@ -6,7 +6,7 @@
         <file alias="delete">img/shanchu.png</file>
         <file alias="insert">img/xinzeng.png</file>
         <file alias="insert_txt">img/xinjian.png</file>
-        <file alias="update1">img/修改.svg</file>
         <file alias="update">img/修改资料.png</file>
+        <file alias="icon">img/图标.png</file>
     </qresource>
 </RCC>

@@ -66,3 +66,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     tool_img.qrc
+
+RC_FILE += \
+    ico.rc
