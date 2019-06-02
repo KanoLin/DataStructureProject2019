@@ -226,12 +226,9 @@ void MainWindow::showSearch()
         QMessageBox::warning(this,"警告","未打开数据表！");
         return;
     }
-    //SearchDialog s(this);
-    SearchDialog1 s2(this);
-    s2.setMainWindow(this);
-    //s2.exec();
-    //s.exec();
-    if (s2.exec()){
+    SearchDialog1 s1(this);
+    s1.setMainWindow(this);
+    if (s1.exec()){
         ui->table->clearContents();
         ui->table->setRowCount(0);
         gettimeofday(&tpstart,NULL);

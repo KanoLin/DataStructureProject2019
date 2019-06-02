@@ -15,12 +15,12 @@ class SearchDialog1 : public QDialog
 public:
     explicit SearchDialog1(QWidget *parent = nullptr);
     ~SearchDialog1();
-    void setMainWindow(MainWindow *w);
-    void accept();
+    void setMainWindow(MainWindow *w);  //绑定主窗口对象
+    void accept();                      //重载QDialog函数
 
 private:
-    Ui::SearchDialog1 *ui;
-    MainWindow *mw;
+    Ui::SearchDialog1 *ui;              //界面布局文件
+    MainWindow *mw;                     //主窗口对象指针
 };
 
 #endif // SEARCHDIALOG2_H
